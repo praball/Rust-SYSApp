@@ -1,0 +1,57 @@
+.alpha-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.alpha-content {
+  /* text-align: center; */
+  margin-bottom: 20px;
+  background-color: #f8f9fa;
+  padding: 2%;
+  border-radius: 4%;
+}
+
+.alpha-heading {
+  text-decoration: underline;
+  text-align: center;
+  font-size: 2rem;
+  color: #333;
+}
+
+.alpha-description {
+  font-size: 1.2rem;
+  color: #555;
+  margin-top: 10px;
+}
+
+.text-area {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.alpha-description {
+  font-size: 1.2rem;
+  color: #555;
+  margin-top: 10px;
+}
+
+.alpha-description ul {
+  list-style-type: disc;
+  padding-left: 0; /* Updated padding */
+}
+
+.alpha-description li {
+  margin-left: 20px; /* Add margin to align with text */
+}
+
+.notes-heading {
+  font-size: 2rem;
+  color: #0986a8; /* React vibes color */
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Adding subtle shadow */
+}

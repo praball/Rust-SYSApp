@@ -1,0 +1,60 @@
+.activity-bar {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  background-color: #333;
+  color: white;
+  padding: 5px;
+}
+
+.files-option {
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 10px;
+  margin-bottom: 5px;
+  text-align: center;
+  min-width: 3rem;
+  position: relative;
+}
+
+.files-dropdown {
+  position: absolute; /* Set absolute */
+  top: calc(100% + 5px); /* Position the dropdown below the files option */
+  left: 0; /* Align */
+  z-index: 1; /* Above */
+  background-color: #444;
+  border-radius: 10px;
+  width: 100%;
+}
+
+.files-dropdown div {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.file-title:hover {
+  background-color: #444;
+  border-radius: 10px;
+}
+
+.files-options:hover {
+  background-color: steelblue;
+  border-radius: 10px;
+}
+
+.page-button {
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 3px;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.page-button:hover {
+  background-color: #555;
+}
+
+.page-button.active {
+  background-color: #666;
+}

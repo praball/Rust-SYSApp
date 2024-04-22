@@ -1,0 +1,156 @@
+1. (SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem, SystemTraySubmenu, WindowBuilder, WindowUrl)-approach implemented
+
+    #![cfg_attr(all(not(debug_assertions), target_os = "windows"), windows_subsystem = "windows")]
+
+    use tauri::{ Manager, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem, SystemTraySubmenu, WindowBuilder, WindowUrl };
+
+    fn main() {
+        let system_tray_menu = SystemTrayMenu::new()
+            .add_item(CustomMenuItem::new("alpha".to_string(), "Show Alpha Window"))
+            .add_item(CustomMenuItem::new("beta".to_string(), "Show Beta Window"))
+            .add_native_item(SystemTrayMenuItem::Quit);
+
+        tauri::Builder::default()
+            .setup(|app| {
+                let alpha_window = WindowBuilder::new(app, "alpha".to_string(), WindowUrl::default())
+                    .title("Alpha Window")
+                    .build()
+                    .unwrap();
+
+                let beta_window = WindowBuilder::new(app, "beta".to_string(), WindowUrl::default())
+                    .title("Beta Window")
+                    .build()
+                    .unwrap();
+
+                let system_tray = app.system_tray().build();
+                system_tray.set(system_tray_menu).enable().unwrap();
+
+                let alpha_window_clone = alpha_window.clone();
+                let beta_window_clone = beta_window.clone();
+
+                system_tray.on_event(move |event| match event {
+                    SystemTrayEvent::MenuItemClick { id, .. } => {
+                        if id == "alpha" {
+                            alpha_window_clone.show().unwrap();
+                            beta_window_clone.hide().unwrap();
+                        } else if id == "beta" {
+                            alpha_window_clone.hide().unwrap();
+                            beta_window_clone.show().unwrap();
+                        }
+                    }
+                    _ => {}
+                });
+
+                Ok(())
+            })
+            .run(tauri::generate_context!())
+            .expect("error while running tauri application");
+    }
+
+    struct CustomMenuItem {
+        id: String,
+        label: String,
+    }
+
+    impl CustomMenuItem {
+        fn new(id: String, label: String) -> Self {
+            Self { id, label }
+        }
+    }
+
+    impl<'a> From<CustomMenuItem> for SystemTrayMenuItem<'a> {
+        fn from(item: CustomMenuItem) -> Self {
+            SystemTrayMenuItem::CustomMenuItem(item.id, item.label)
+        }
+    }
+
+2. Window-builder implemented
+
+3. Global Shortcut Manager implemented
+
+    #![cfg_attr(all(not(debug_assertions), target_os = "windows"), windows_subsystem = "windows")]
+    use tauri::{GlobalShortcutManager, Manager, WindowBuilder, WindowUrl};
+
+    fn main() {
+    tauri::Builder::default()
+        .setup(|app| {
+            let alpha_window = WindowBuilder::new(app, "alpha".to_string(), WindowUrl::default())
+                .title("Alpha Window")
+                .build()
+                .unwrap();
+
+            let beta_window = WindowBuilder::new(app, "beta".to_string(), WindowUrl::default())
+                .title("Beta Window")
+                .build()
+                .unwrap();
+
+            let mut shortcut_manager = app.global_shortcut_manager();
+            let shortcut_manager_for_a = shortcut_manager.register("CmdOrCtrl+A", move || {
+                alpha_window.show().unwrap();
+                beta_window.hide().unwrap();
+            });
+
+            if let Err(err) = shortcut_manager_for_a {
+                eprintln!("Error registering shortcut A: {:?}", err);
+            }
+
+            let shortcut_manager_for_b = shortcut_manager.register("CmdOrCtrl+B", move || {
+                alpha_window.hide().unwrap();
+                beta_window.show().unwrap();
+            });
+
+            if let Err(err) = shortcut_manager_for_b {
+                eprintln!("Error registering shortcut B: {:?}", err);
+            }
+
+            Ok(())
+        })
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+    }
+
+4. SystemTray Function used n works but opens 3 windows:
+
+    #![cfg_attr( all(not(debug_assertions), target_os = "windows"),windows_subsystem = "windows" )]
+    use tauri::{ CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem, WindowBuilder, WindowUrl, };
+
+    fn main() {
+        let system_tray_menu = SystemTrayMenu::new()
+            .add_item(CustomMenuItem::new("show_alpha".to_string(), "Show Alpha Window"))
+            .add_item(CustomMenuItem::new("show_beta".to_string(), "Show Beta Window"));
+
+        tauri::Builder::default()
+            .setup(|app| {
+                let alpha_window = WindowBuilder::new(app, "alpha".to_string(), WindowUrl::default())
+                    .title("Alpha Window")
+                    .build()
+                    .unwrap();
+
+                let beta_window = WindowBuilder::new(app, "beta".to_string(), WindowUrl::default())
+                    .title("Beta Window")
+                    .build()
+                    .unwrap();
+
+                let system_tray = SystemTray::new().with_menu(system_tray_menu);
+
+                let alpha_window_clone = alpha_window.clone();
+                let beta_window_clone = beta_window.clone();
+
+                system_tray.on_event(move |event| match event {
+                    SystemTrayEvent::MenuItemClick { id, .. } => {
+                        if id == "show_alpha" {
+                            alpha_window_clone.show().unwrap();
+                            beta_window_clone.hide().unwrap();
+                        } else if id == "show_beta" {
+                            alpha_window_clone.hide().unwrap();
+                            beta_window_clone.show().unwrap();
+                        }
+                    }
+                    _ => {}
+                });
+
+                Ok(())
+            })
+            .run(tauri::generate_context!())
+            .expect("error while running tauri application");
+    }
